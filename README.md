@@ -116,6 +116,15 @@ Requires a C++11 compiler. On macOS that's Xcode Command Line Tools
 The C++ source is vendored under `vendor/` so there's nothing to install
 separately. `cargo build` handles everything.
 
+### Cloning
+
+The recommended way to clone this repository (pulls submodules and keeps the
+checkout small) is:
+
+```bash
+git clone --recurse-submodules --filter=blob:none --also-filter-submodules https://github.com/giddyos/pdq-rs.git
+```
+
 ```bash
 cargo build
 cargo run --example hash_image -- /path/to/photo.jpg
