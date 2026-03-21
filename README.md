@@ -7,7 +7,7 @@ PDQ is a 256-bit perceptual image hash. Two images that are visually similar
 produce hashes with a low Hamming distance. Two unrelated images will be ~128
 bits apart. It was designed for detecting near-duplicate harmful content at
 scale and is used in production by Meta and partners in the
-[ThreatExchange](https://developers.facebook.com/programs/threat-exchange/)
+[ThreatExchange](https://developers.facebook.com/docs/threat-exchange/getting-started)
 program.
 
 This crate wraps the upstream C++ library via a thin `extern "C"` shim and
