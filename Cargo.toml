@@ -8,6 +8,7 @@ readme = "README.md"
 keywords = ["pdq", "image hashing", "perceptual hashing", "bindings"]
 categories = ["api-bindings", "computer-vision", "encoding"]
 repository = "https://github.com/giddyos/pdq-rs"
+exclude = ["ThreatExchange/*"]
 
 [dependencies]
 image = "0.25.10"
