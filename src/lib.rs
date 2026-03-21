@@ -349,12 +349,17 @@ mod tests {
 
     use super::*;
 
-    const DATA_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data")));
-    
+    const DATA_PATH: LazyLock<PathBuf> =
+        LazyLock::new(|| PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data")));
+
     #[test]
     fn test_hash_and_distance() {
-        let hash1 = PdqHash256 { bits: [0b10101010; 32] };
-        let hash2 = PdqHash256 { bits: [0b11110000; 32] };
+        let hash1 = PdqHash256 {
+            bits: [0b10101010; 32],
+        };
+        let hash2 = PdqHash256 {
+            bits: [0b11110000; 32],
+        };
 
         let dist = hamming_distance(&hash1, &hash2);
         assert_eq!(dist.distance(), 128);
@@ -377,7 +382,11 @@ mod tests {
         let (dihedral, quality) =
             pdq_dihedral_hash_rgb_full(&img).expect("Expected image to be hashable");
         assert!(quality > 49, "Expected positive quality score");
-        assert_eq!(dihedral.original.bits.len(), 32, "Expected hash length of 32 bytes");
+        assert_eq!(
+            dihedral.original.bits.len(),
+            32,
+            "Expected hash length of 32 bytes"
+        );
 
         let expected_hashes = [
             "f8f8f0cee0f4a84f06370a22038f63f0b36e2ed596621e1d33e6b39c4e9c9b22",
@@ -402,7 +411,10 @@ mod tests {
         ];
 
         for (actual, expected) in actual_hashes.iter().zip(expected_hashes.iter()) {
-            assert_eq!(actual, expected, "Dihedral hash does not match expected value");
+            assert_eq!(
+                actual, expected,
+                "Dihedral hash does not match expected value"
+            );
         }
     }
 
@@ -419,8 +431,8 @@ mod tests {
             "f8f8f0cee0f4a84f06370a22038f63f0b36e2ed596621e1d33e6b39c4e9c9b22",
             load(include_bytes!("../data/bridge-1-original.jpg"))
         );
-                
-         assert_eq!(
+
+        assert_eq!(
             "30a10efd71cc3d429013d48d0ffffc52e34e0e17ada952a9d29685211ea9e5af",
             load(include_bytes!("../data/bridge-2-rotate-90.jpg"))
         );
@@ -429,12 +441,12 @@ mod tests {
             "adad5a64b5a142e75b62a09857da895ae63b847fc23794b766b319361bc93188",
             load(include_bytes!("../data/bridge-3-rotate-180.jpg"))
         );
-        
+
         assert_eq!(
             "a5f0a457a48995e8c9065c275aaa5498b61ba4bdf8fcf80387c32f8b1bfc4f05",
             load(include_bytes!("../data/bridge-4-rotate-270.jpg"))
         );
-        
+
         assert_eq!(
             "f8f80f31e0f417b20e37f5cd028f980fb36ed02a9662c1e233e64c634e9c64dd",
             load(include_bytes!("../data/bridge-5-flipx.jpg"))
@@ -444,7 +456,7 @@ mod tests {
             "0dad2599b1a1bd1a5362576742da32a5e63b7380c2374b4866b366c91bc9ce77",
             load(include_bytes!("../data/bridge-6-flipy.jpg"))
         );
-        
+
         assert_eq!(
             "f0a5e102f1ccc0bd945308720fff038de34ef1e8ada9a956d2967ade5ea91a50",
             load(include_bytes!("../data/bridge-7-flip-plus-1.jpg"))
@@ -454,7 +466,6 @@ mod tests {
             "a5f05aa8a4896a17c906a2d85aaaab07b61b5b42f8fc07fc87c3d0741bfcb0fa",
             load(include_bytes!("../data/bridge-8-flip-minus-1.jpg"))
         );
-
     }
 
     #[test]
@@ -470,5 +481,4 @@ mod tests {
         assert!(pdq_dihedral_hash_grey(&img).is_none());
         assert!(pdq_dihedral_hash_grey_full(&img).is_none());
     }
-
 }
