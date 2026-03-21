@@ -320,14 +320,14 @@ pub fn pdq_dihedral_hash_grey_full(image: &DynamicImage) -> Option<(PdqDihedralH
 
     Some((
         PdqDihedralHashes {
-            original: h0.into(),
-            rotate90: h90.into(),
-            rotate180: h180.into(),
-            rotate270: h270.into(),
-            flip_x: hfx.into(),
-            flip_y: hfy.into(),
-            flip_plus1: hfp1.into(),
-            flip_minus1: hfm1.into(),
+            original: h0,
+            rotate90: h90,
+            rotate180: h180,
+            rotate270: h270,
+            flip_x: hfx,
+            flip_y: hfy,
+            flip_plus1: hfp1,
+            flip_minus1: hfm1,
         },
         quality,
     ))
@@ -349,7 +349,7 @@ mod tests {
 
     use super::*;
 
-    const DATA_PATH: LazyLock<PathBuf> =
+    static DATA_PATH: LazyLock<PathBuf> =
         LazyLock::new(|| PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data")));
 
     #[test]
