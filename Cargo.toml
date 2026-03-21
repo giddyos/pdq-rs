@@ -1,0 +1,17 @@
+[package]
+name = "pdq-rs"
+version = "1.0.0"
+edition = "2024"
+description = "Rust bindings for Facebook's PDQ image hashing library"
+license = "MIT"
+readme = "README.md"
+keywords = ["pdq", "image hashing", "perceptual hashing", "bindings"]
+categories = ["api-bindings", "computer-vision", "encoding"]
+repository = "https://github.com/giddyos/pdq-rs"
+
+[dependencies]
+image = "0.25.10"
+
+[build-dependencies]
+bindgen = "0.72.1"
+cc = "1.0"
