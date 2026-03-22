@@ -13,6 +13,13 @@ exclude = ["ThreatExchange/*"]
 [dependencies]
 image = "0.25.10"
 
+[dev-dependencies]
+criterion = "0.8.2"
+
+[[bench]]
+name = "pdq"
+harness = false
+
 [build-dependencies]
 bindgen = "0.72.1"
 cc = "1.0"
