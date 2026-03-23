@@ -1,0 +1,62 @@
+package giddyos:pdq;
+
+world pdq {
+  record pdq-hash {
+    bits: list<u8>,
+  }
+
+  record hash-result {
+    hash: pdq-hash,
+    quality: s32,
+  }
+
+  record dihedral-hashes {
+    original: pdq-hash,
+    rotate90: pdq-hash,
+    rotate180: pdq-hash,
+    rotate270: pdq-hash,
+    flip-x: pdq-hash,
+    flip-y: pdq-hash,
+    flip-plus1: pdq-hash,
+    flip-minus1: pdq-hash,
+  }
+
+  record dihedral-hash-result {
+    hashes: dihedral-hashes,
+    quality: s32,
+  }
+
+  enum distance-kind {
+    exact,
+    near-duplicate,
+    similar,
+    different,
+    unrelated,
+  }
+
+  record distance-info {
+    bits: u16,
+    matching-bits: u16,
+    similarity-ratio: f32,
+    similarity-percent: f32,
+    kind: distance-kind,
+    exact: bool,
+    near-duplicate: bool,
+  }
+
+  export hash-from-hex: func(hex: string) -> option<pdq-hash>;
+  export hash-to-hex: func(hash: pdq-hash) -> result<string, string>;
+  export hash-to-binary: func(hash: pdq-hash) -> result<string, string>;
+
+  export hash-rgb: func(image-bytes: list<u8>) -> result<option<hash-result>, string>;
+  export hash-rgb-full: func(image-bytes: list<u8>) -> result<option<hash-result>, string>;
+  export hash-grey: func(image-bytes: list<u8>) -> result<option<hash-result>, string>;
+  export hash-grey-full: func(image-bytes: list<u8>) -> result<option<hash-result>, string>;
+
+  export dihedral-hash-rgb: func(image-bytes: list<u8>) -> result<option<dihedral-hash-result>, string>;
+  export dihedral-hash-rgb-full: func(image-bytes: list<u8>) -> result<option<dihedral-hash-result>, string>;
+  export dihedral-hash-grey: func(image-bytes: list<u8>) -> result<option<dihedral-hash-result>, string>;
+  export dihedral-hash-grey-full: func(image-bytes: list<u8>) -> result<option<dihedral-hash-result>, string>;
+
+  export hamming-distance: func(a: pdq-hash, b: pdq-hash) -> result<distance-info, string>;
+}

@@ -5,6 +5,9 @@ use image::DynamicImage;
 
 include!(concat!(env!("OUT_DIR"), "/pdq_bindings.rs"));
 
+#[cfg(feature = "wit")]
+pub mod wit;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum HammingDistanceKind {
     /// 0 bits different, identical hashes

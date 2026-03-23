@@ -10,8 +10,17 @@ categories = ["api-bindings", "computer-vision", "encoding"]
 repository = "https://github.com/giddyos/pdq-rs"
 exclude = ["ThreatExchange/*"]
 
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = []
+wit = ["dep:wit-bindgen"]
+
 [dependencies]
 image = "0.25.10"
+wit-bindgen = { version = "0.54", optional = true, features = ["macros"] }
+
 
 [dev-dependencies]
 criterion = "0.8.2"

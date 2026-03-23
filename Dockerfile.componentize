@@ -1,0 +1,79 @@
+# syntax=docker/dockerfile:1
+ARG WASI_SDK_VERSION=25
+ARG WASI_SDK_VERSION_FULL=25.0
+
+FROM rust:1 AS builder
+
+ARG WASI_SDK_VERSION
+ARG WASI_SDK_VERSION_FULL
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    clang \
+    curl \
+    libclang-dev \
+    xz-utils \
+    ca-certificates \
+    && find /usr/lib -path '*/libclang.so' -exec ln -sf {} /usr/lib/libclang.so \; -quit \
+    && rm -rf /var/lib/apt/lists/*
+
+# Detect arch and install WASI SDK into /opt/wasi-sdk
+RUN set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    case "$ARCH" in \
+    amd64) WASI_ARCH="x86_64" ;; \
+    arm64) WASI_ARCH="arm64" ;; \
+    *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac; \
+    TARBALL="wasi-sdk-${WASI_SDK_VERSION_FULL}-${WASI_ARCH}-linux.tar.gz"; \
+    curl -fsSL \
+    "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VERSION}/${TARBALL}" \
+    -o /tmp/wasi-sdk.tar.gz; \
+    tar -xzf /tmp/wasi-sdk.tar.gz -C /opt; \
+    mv /opt/wasi-sdk-${WASI_SDK_VERSION_FULL}-${WASI_ARCH}-linux /opt/wasi-sdk; \
+    rm /tmp/wasi-sdk.tar.gz
+
+ENV WASI_SDK_PATH=/opt/wasi-sdk
+ENV LIBCLANG_PATH=/usr/lib
+
+RUN rustup target add wasm32-wasip2
+
+COPY Cargo.toml Cargo.lock ./
+
+# fails to parse cargo.toml without this
+RUN mkdir -p benches && echo 'pub fn _stub() {}' > benches/pdq.rs
+
+RUN mkdir -p src && echo 'pub fn _stub() {}' > src/lib.rs && \
+    cargo fetch --target wasm32-wasip2
+
+COPY src ./src
+COPY wit ./wit
+COPY vendor ./vendor
+COPY build.rs ./
+
+RUN cargo build \
+    --target wasm32-wasip2 \
+    --release \
+    --features wit
+
+FROM node:18-alpine AS node-builder
+WORKDIR /build
+
+RUN npm install -g @bytecodealliance/jco
+
+COPY --from=builder /build/target/wasm32-wasip2/release/pdq_rs.wasm ./
+
+RUN jco opt pdq_rs.wasm -o pdq_rs_opt.wasm
+
+RUN jco transpile pdq_rs_opt.wasm \
+    -o js \
+    --name index \
+    --minify
+
+FROM scratch AS artifact
+
+# copy the js folder from the node-builder stage
+COPY --from=node-builder /build/js ./js
+COPY --from=node-builder /build/pdq_rs.wasm ./wasm/pdq_rs.wasm
+COPY --from=node-builder /build/pdq_rs_opt.wasm ./wasm/pdq_rs_opt.wasm
