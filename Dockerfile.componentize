@@ -2,6 +2,15 @@
 ARG WASI_SDK_VERSION=25
 ARG WASI_SDK_VERSION_FULL=25.0
 
+FROM scratch AS source
+COPY benches/      /io/benches/
+COPY src/          /io/src/
+COPY vendor/       /io/vendor/
+COPY wit/          /io/wit/
+COPY build.rs      /io/
+COPY Cargo.lock    /io/
+COPY Cargo.toml    /io/
+
 FROM rust:1 AS builder
 
 ARG WASI_SDK_VERSION
@@ -47,10 +56,7 @@ RUN mkdir -p benches && echo 'pub fn _stub() {}' > benches/pdq.rs
 RUN mkdir -p src && echo 'pub fn _stub() {}' > src/lib.rs && \
     cargo fetch --target wasm32-wasip2
 
-COPY src ./src
-COPY wit ./wit
-COPY vendor ./vendor
-COPY build.rs ./
+COPY --from=source /io/ ./
 
 RUN cargo build \
     --target wasm32-wasip2 \
@@ -71,9 +77,10 @@ RUN jco transpile pdq_rs_opt.wasm \
     --name index \
     --minify
 
+RUN mkdir -p wasm && mv pdq_rs.wasm pdq_rs_opt.wasm wasm
+
 FROM scratch AS artifact
 
 # copy the js folder from the node-builder stage
 COPY --from=node-builder /build/js ./js
-COPY --from=node-builder /build/pdq_rs.wasm ./wasm/pdq_rs.wasm
-COPY --from=node-builder /build/pdq_rs_opt.wasm ./wasm/pdq_rs_opt.wasm
+COPY --from=node-builder /build/wasm/ ./wasm
