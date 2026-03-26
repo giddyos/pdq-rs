@@ -6,7 +6,7 @@ fn main() {
     println!("cargo:rerun-if-env-changed=WASI_SDK_PATH");
 
     let target = env::var("TARGET").expect("TARGET not set");
-    let host   = env::var("HOST").expect("HOST not set");
+    let host = env::var("HOST").expect("HOST not set");
 
     let mut build = cc::Build::new();
     build
@@ -30,8 +30,7 @@ fn main() {
         .file("vendor/pdq/cpp/downscaling/downscaling.cpp");
 
     if target == "wasm32-wasip2" {
-        env::var("WASI_SDK_PATH")
-                .expect("WASI_SDK_PATH must be set for wasm32-wasip2 builds");    
+        env::var("WASI_SDK_PATH").expect("WASI_SDK_PATH must be set for wasm32-wasip2 builds");
     }
 
     build.compile("pdq-cpp");
@@ -39,15 +38,13 @@ fn main() {
     bindgen::Builder::default()
         .header("vendor/pdq_wrapper.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
-        .clang_arg("-x").clang_arg("c")
+        .clang_arg("-x")
+        .clang_arg("c")
         .clang_arg("-Ivendor")
         .clang_arg(format!("--target={host}"))
         .layout_tests(false)
         .generate()
         .expect("bindgen failed")
-        .write_to_file(
-            PathBuf::from(env::var("OUT_DIR").unwrap()).join("pdq_bindings.rs"),
-        )
+        .write_to_file(PathBuf::from(env::var("OUT_DIR").unwrap()).join("pdq_bindings.rs"))
         .expect("couldn't write bindings");
-
 }
