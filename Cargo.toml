@@ -19,7 +19,7 @@ wit = ["dep:wit-bindgen"]
 
 [dependencies]
 image = "0.25.10"
-wit-bindgen = { version = "0.54", optional = true, features = ["macros"] }
+wit-bindgen = { version = "0.55", optional = true, features = ["macros"] }
 
 
 [dev-dependencies]
